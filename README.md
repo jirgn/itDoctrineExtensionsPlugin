@@ -19,3 +19,15 @@ Main Part is the Informix Driver Implementation
 * sfDoctrinePlugin enabled
 * sfPHPUnitPlugin (for running the tests)
 * Informix 11.5.x
+
+
+## Installation
+
+### Common
+
+### Patching Doctrine
+
+
+
+## Informix Environment
+
