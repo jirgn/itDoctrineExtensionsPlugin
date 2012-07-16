@@ -1,0 +1,11 @@
+all:
+  ifx_dummy:
+    class: sfDoctrineDatabase
+    param:
+      #dsn: 'informix:host=itools-informix32; service=9088;database=ifx_test;server=itools;protocol=onsoctcp;db_locale=en_us.8859-1;client_locale=en_us.UTF8'
+      dsn: 'informix:host=itools-informix32; service=9088;database=ifx_test;server=itools;protocol=onsoctcp;'
+      username: root
+      password: fred8
+#      dsn: 'pgsql:host=itools-informix32;dbname=ifx_test'
+#      username: postgres
+#      password: fred8

@@ -1,0 +1,22 @@
+#Test_SimpleRecord:
+#  simple_01:
+#    id: 1
+#    varcharField: testVarchar
+#    integerField: 1000
+#    booleanField: true
+#  simple_02:
+#    id: 2
+#    varcharField: other
+#    integerField: 2000
+#    booleanField: false
+#    ReferenceRecords: [ref_01, ref_02]
+#
+#Test_ReferenceRecord:
+#  ref_01:
+#    id: 1
+#    varcharField1: first
+#    varcharField2: second
+#  ref_02:
+#    id: 2
+#    varcharField1: sec_first
+#    varcharField2: sec_second

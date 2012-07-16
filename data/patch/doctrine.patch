@@ -1,0 +1,72 @@
+Index: lib/vendor/symfony/lib/plugins/sfDoctrinePlugin/lib/vendor/doctrine/Doctrine/Connection/UnitOfWork.php
+===================================================================
+--- lib/vendor/symfony/lib/plugins/sfDoctrinePlugin/lib/vendor/doctrine/Doctrine/Connection/UnitOfWork.php	(revision 7690)
++++ lib/vendor/symfony/lib/plugins/sfDoctrinePlugin/lib/vendor/doctrine/Doctrine/Connection/UnitOfWork.php	(working copy)
+@@ -940,11 +940,13 @@
+             if ($record->$identifier == null) { 
+                 if (($driver = strtolower($this->conn->getDriverName())) == 'pgsql') {
+                     $seq = $table->getTableName() . '_' . $table->getColumnName($identifier);
++                     $id = $this->conn->sequence->lastInsertId($seq);
+                 } elseif ($driver == 'oracle' || $driver == 'mssql') {
+                     $seq = $table->getTableName();
++                     $id = $this->conn->sequence->lastInsertId($seq);
++                } elseif ($driver == 'informix') {
++                     $id = $this->conn->sequence->lastInsertId($table->getTableName(), $table->getColumnName($identifier));
+                 }
+-    
+-                $id = $this->conn->sequence->lastInsertId($seq);
+             } else {
+                 $id = $record->$identifier;
+             }
+Index: lib/vendor/symfony/lib/plugins/sfDoctrinePlugin/lib/vendor/doctrine/Doctrine/Query/Abstract.php
+===================================================================
+--- lib/vendor/symfony/lib/plugins/sfDoctrinePlugin/lib/vendor/doctrine/Doctrine/Query/Abstract.php	(revision 7690)
++++ lib/vendor/symfony/lib/plugins/sfDoctrinePlugin/lib/vendor/doctrine/Doctrine/Query/Abstract.php	(working copy)
+@@ -205,13 +205,13 @@
+      */
+     protected $_queryComponents = array();
+ 
+-	/**
++  /**
+      * Stores the root DQL alias
+      *
+      * @var string
+      */
+     protected $_rootAlias = '';
+-	
++  
+     /**
+      * @var integer $type                   the query type
+      *
+@@ -555,7 +555,7 @@
+     public function fixArrayParameterValues($params = array())
+     {
+         $i = 0;
+-	
++  
+         foreach ($params as $param) {
+             if (is_array($param)) {
+                 $c = count($param);
+@@ -964,8 +964,8 @@
+         // Get prepared SQL params for execution
+         $params = $this->getInternalParams();
+ 
+-        if ($this->isLimitSubqueryUsed() &&
+-                $this->_conn->getAttribute(Doctrine_Core::ATTR_DRIVER_NAME) !== 'mysql') {
++        $noLimitInSubquerySupport = array('mysql', 'informix');
++        if ($this->isLimitSubqueryUsed() && ! in_array($this->_conn->getAttribute(Doctrine_Core::ATTR_DRIVER_NAME), $noLimitInSubquerySupport))	{
+             $params = array_merge((array) $params, (array) $params);
+         }
+ 
+Index: lib/vendor/symfony/lib/plugins/sfDoctrinePlugin/lib/vendor/doctrine/Doctrine/Query.php
+===================================================================
+--- lib/vendor/symfony/lib/plugins/sfDoctrinePlugin/lib/vendor/doctrine/Doctrine/Query.php	(revision 7690)
++++ lib/vendor/symfony/lib/plugins/sfDoctrinePlugin/lib/vendor/doctrine/Doctrine/Query.php	(working copy)
+@@ -1268,6 +1268,7 @@
+ 
+             switch (strtolower($this->_conn->getDriverName())) {
+                 case 'mysql':
++                case 'informix':
+                     $this->useQueryCache(false);
+ 
+                     // mysql doesn't support LIMIT in subqueries
