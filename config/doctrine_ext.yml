@@ -1,9 +1,5 @@
 model_builder_options:
   classPrefix:
-    kbbOfflineCorePlugin: Intranet
-    kbbOnlineCorePlugin: Online
     itDoctrineExtensionsPlugin: Test_
   baseClassName:
-    kbbOfflineCorePlugin: kbbOfflinePluginBaseModel
-    kbbOnlineCorePlugin: sfDoctrineRecord
     itDoctrineExtensionsPlugin: sfDoctrineRecord
