@@ -15,7 +15,7 @@ class ItDoctrineExtensions_SequenceTestCase extends sfBasePhpunitTestCase	{
   private $sequence = null;
 
   protected function _start()	{
-    $this->connection = Doctrine_Manager::getInstance()->getConnection('ifx_dummy');
+    $this->connection = Doctrine_Manager::getInstance()->getConnection('ifx_dummy_connecton');
     $this->sequence = $this->connection->sequence;
   }
 

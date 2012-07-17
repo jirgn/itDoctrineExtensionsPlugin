@@ -26,7 +26,7 @@ class ItDoctrineExtension_ConnectionInformixTestCase extends sfBasePhpunitTestCa
   protected $connection = null;
 
   protected function _start() {
-    $this->connection = Doctrine_Manager::getInstance()->getConnection('ifx_dummy');
+    $this->connection = Doctrine_Manager::getInstance()->getConnection('ifx_dummy_connecton');
   }
 
 
@@ -38,7 +38,7 @@ class ItDoctrineExtension_ConnectionInformixTestCase extends sfBasePhpunitTestCa
     if($this->connection->isConnected()) {
       $this->connection->close();
     }
-    $this->assertTrue($this->connection->connect(), 'can not connect to ifx_dummy database with doctrine connection');
+    $this->assertTrue($this->connection->connect(), 'can not connect to ifx_dummy_connecton database with doctrine connection');
   }
 
 }

@@ -1,4 +1,4 @@
-# itDoctrineExtensionsPlugin - Informix for Doctrine
+# itDoctrineExtensionsPlugin - Informix Driver for Doctrine
 
 This Plugin adds the following additional funtionality to the standard sfDoctrinePlugin.
 Main Part is the Informix Driver Implementation.
@@ -161,7 +161,7 @@ There is not much to say in this case. You just have to run the standard symfony
 
 and you are done. you will find your classes in the lib/model dir as you know it.
 
-#### prefixed classes
+#### prefixed classes and builder-options for plugins
 
 In some special cases you will need to prefix your classes to mark them in some conventional way.
 At least this was the case in the projekct i created this plugin for.
@@ -182,6 +182,7 @@ To handle this, use an additional config file ''doctrine_ext.yml'', to configure
         #someOtherPlugin: someSpecialBaseClassForRecord
 
 Possible options are:
+
 *   baseClassesDirectory :: string (default : 'base')
 *   baseClassName :: string (default : 'sfDoctrineRecord')
 *   generateBaseClasses :: boolean (default : true)
@@ -196,7 +197,103 @@ So when you choose, you need this config part, you will see, that **the standard
 This is, cause the doctine model builder can only handle one config on time.
 To get arround this use the new task
 
+    $ symfony doctrine:build-plugin-model --plugin="name_of_plugin"
+
+for every plugin that holds its own model definition.
+
+Another drawback when using this special configuration is, that some of the doctrine stanard tasks whould not work anymore.
+This is for example the case, for creating the database tables.
+So here you have to generate the sql by using task
+
+    $ symfony doctrine:build-sql
+
+This will generate a sql file with initial schema in data/sql/schema.sql
+Use this and create the tables directly in the informix db console or dbaccess.
+
+In development process this should only be used once. Use migrations to handle further schema changes.
+This will be nomally supportet through the standard doctrine:migrate task.
+
+### testing if everything works
+
+To enshure everything works correctly, there are some integrationlevel unittests.
+Before they can be run, you have to do some tasks an config stuff. See this as a simple example how to use
+this plugin.
+
+#### setup configuration
+
+Uncomment the schema in plugins/itDoctrineExtionsPlugin/config/doctrine/ifx_test_schema.yml so that it looks like
+
+    # plugins/itDoctrineExtionsPlugin/config/doctrine/ifx_test_schema.yml
+    connection: ifx_dummy_connecton
+
+    SimpleRecord:
+      columns:
+        id:
+    ...
+
+    ReferenceRecord:
+      tableName: test_table_02
+      columns:
+    ...
+
+    SelfReferenceRecord:
+      columns:
+    ...
+
+configure your database.
+
+    # config/databases.yml
+    all:
+      ifx_dummy_connecton:
+           class: sfDoctrineDatabase
+           param:
+             dsn: 'informix:host=<your_informix_host>; service=<your_port>; database=<your_db_name>; server=<your_server_name>; protocol=onsoctcp;'
+             username: <your_ifx_user>
+             password: <your_ifx_password>
+
+make shure prefixes for tests are active
+
+    # plugins/itDoctrineExtensionsPlugin/config/doctrine_ext.yml
+    model_builder_options:
+      classPrefix:
+        itDoctrineExtensionsPlugin: Test_
+      baseClassName:
+        itDoctrineExtensionsPlugin: sfDoctrineRecord
+
+generate your model
+
     $ symfony doctrine:build-plugin-model
+
+create your db in informix dbaccess or console
+
+    $ CREATE DATABASE <your_db_name>;
+
+activate logging
+
+    $ symfony informix:activate-logging --db-name="<your_db_name>"
+
+generate initial schema sql
+
+    $ symfony doctrine:build-sql
+
+build schema directly in informix by executing generated file data/sql/schema.sql
+
+
+
+
+## multible connections
+
+As you have seen above symfony/doctrine gives you the possiblity to work with different connections simultaniously.
+Problem is - this does not realy work very well, if you have models that should work only on one connection, or you want to
+have models with different default connection.
+
+To give you a possibility to deal with this we build a special migrate task
+
+    $ symfony doctrine:migrate-connection <name_of_connection>
+
+to only migrate models for the given connection name.
+
+**If you need the multible connections, you need to write your migrations by hand.**
 
 ## Tasks
 
