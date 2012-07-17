@@ -317,10 +317,14 @@ to only migrate models for the given connection name.
 
 ## Tasks
 
-### doctrine:build-plugin-model
+This Plugin adds some additional Tasks that should help you working on your project.
+See symfony help for more information
 
-### informix:activate-logging
-
-### doctrine:migrate-connection
+*   doctrine:build-plugin-model
+*   informix:activate-logging
+* doctrine:migrate-connection
 
 ## Known Issues
+
+*   when using multible connections some standard doctrine tasks will break
+*   doctrine:create database is not supported for informix

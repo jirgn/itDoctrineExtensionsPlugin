@@ -1,5 +1,5 @@
-model_builder_options:
-  classPrefix:
-    itDoctrineExtensionsPlugin: Test_
-  baseClassName:
-    itDoctrineExtensionsPlugin: sfDoctrineRecord
+#model_builder_options:
+#  classPrefix:
+#    itDoctrineExtensionsPlugin: Test_
+#  baseClassName:
+#    itDoctrineExtensionsPlugin: sfDoctrineRecord
