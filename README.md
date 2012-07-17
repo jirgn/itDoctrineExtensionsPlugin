@@ -109,13 +109,17 @@ http://php.net/manual/en/ref.pdo-informix.connection.php
           username: root
           password:
 
-      ifx_dummy_connecton:
+      ifx_dummy_connection:
         class: sfDoctrineDatabase
         param:
           #dsn: 'informix:host=itools-informix32; service=3306;database=ifx_test;server=itools;protocol=onsoctcp;db_locale=de_DE.819;client_locale=de_DE.UTF8;'
           dsn: 'informix:host=itools-informix32; service=9088;database=ifx_test;server=itools;protocol=onsoctcp;'
           username: root
           password:
+
+To work properly the following directories must be present.
+
+    $ cd <symfony_project_root> && mkdir -p lib/form/doctrine/base && mkdir -p lib/filter/doctrine/base
 
 ### create Model
 
@@ -124,7 +128,7 @@ You specify your model in the standard symfony style. For example our model for 
     config/doctrine/schema.yml
 
     # if working with differnet connections the corresponding connection for the model has to be specified here
-    connection: ifx_dummy_connecton
+    connection: ifx_dummy_connection
 
     SimpleRecord:
       columns:
@@ -224,7 +228,7 @@ this plugin.
 Uncomment the schema in plugins/itDoctrineExtionsPlugin/config/doctrine/ifx_test_schema.yml so that it looks like
 
     # plugins/itDoctrineExtionsPlugin/config/doctrine/ifx_test_schema.yml
-    connection: ifx_dummy_connecton
+    connection: ifx_dummy_connection
 
     SimpleRecord:
       columns:
@@ -244,7 +248,7 @@ configure your database.
 
     # config/databases.yml
     all:
-      ifx_dummy_connecton:
+      ifx_dummy_connection:
            class: sfDoctrineDatabase
            param:
              dsn: 'informix:host=<your_informix_host>; service=<your_port>; database=<your_db_name>; server=<your_server_name>; protocol=onsoctcp;'
@@ -278,7 +282,23 @@ generate initial schema sql
 
 build schema directly in informix by executing generated file data/sql/schema.sql
 
+setup missing folder structure
 
+    $ cd <symfony_project_root> && mkdir -p lib/form/doctrine/base && mkdir -p lib/filter/doctrine/base
+
+init sfPHPUnitPlugin
+
+    $ symfony phpunit:init
+
+run doctrine tests to enshure connection and simple operations work
+
+    $ symfony phpunit:runtest plugins/itDoctrineExtensionsPlugin/test/phpunit/unit/doctrine/
+
+run model test to enshure doctrine queries and references work
+
+    $ php symfony phpunit:runtest plugins/itDoctrineExtensionsPlugin/test/phpunit/unit/model/
+
+Enshure that the db is empty before running the tests. At this time some tests are skipped but this should be ok.
 
 
 ## multible connections

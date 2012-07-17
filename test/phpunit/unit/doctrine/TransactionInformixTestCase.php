@@ -26,7 +26,7 @@ class ItDoctrineExtension_TransactionInformixTestCase extends sfBasePhpunitTestC
 
   protected function _start() {
     parent::_start();
-    $this->connection = Doctrine_Manager::getInstance()->getConnection('ifx_dummy_connecton');
+    $this->connection = Doctrine_Manager::getInstance()->getConnection('ifx_dummy_connection');
   }
 
   public function testTransactionCommitSuccess()  {
