@@ -1,63 +1,63 @@
-connection: ifx_dummy_connection
-
-SimpleRecord:
-  columns:
-    id:
-      type: integer
-      primary: true
-      autoincrement: true
-    varchar_field:
-      type: string(25)
-      default: default
-    text_field:
-      type: string
-    integer_field:
-      type: integer
-      default: 0
-    boolean_field:
-      type: boolean
-      default: false
-    date_field:
-      type: date
-    time_field:
-      type: time
-    timestamp_field:
-      type: timestamp
-
-ReferenceRecord:
-  tableName: test_table_02
-  columns:
-    id:
-      type: integer
-      primary: true
-    simple_record_id:
-      type: integer
-    varchar_field1:
-      type: string(25)
-    column_03:
-      name:  column_03 as varcharField2
-      type: string(25)
-  relations:
-    SimpleRecord:
-      local: simple_record_id
-      foreign: id
-      foreignType: many
-      foreignAlias: ReferenceRecords
-
-SelfReferenceRecord:
-  columns:
-    id:
-      type: integer
-      sequence: test_table_03_seq
-      primary: true
-    varchar_field:
-      type: string(50)
-    self_reference_record_id:
-      type: integer
-  relations:
-    ReferencedByRecord:
-      class: SelfReferenceRecord
-      local: self_reference_record_id
-      foreign: id
-      foreignType: many
-      foreignAlias: ReferencedToRecords
+#connection: ifx_dummy_connection
+#
+#SimpleRecord:
+#  columns:
+#    id:
+#      type: integer
+#      primary: true
+#      autoincrement: true
+#    varchar_field:
+#      type: string(25)
+#      default: default
+#    text_field:
+#      type: string
+#    integer_field:
+#      type: integer
+#      default: 0
+#    boolean_field:
+#      type: boolean
+#      default: false
+#    date_field:
+#      type: date
+#    time_field:
+#      type: time
+#    timestamp_field:
+#      type: timestamp
+#
+#ReferenceRecord:
+#  tableName: test_table_02
+#  columns:
+#    id:
+#      type: integer
+#      primary: true
+#    simple_record_id:
+#      type: integer
+#    varchar_field1:
+#      type: string(25)
+#    column_03:
+#      name:  column_03 as varcharField2
+#      type: string(25)
+#  relations:
+#    SimpleRecord:
+#      local: simple_record_id
+#      foreign: id
+#      foreignType: many
+#      foreignAlias: ReferenceRecords
+#
+#SelfReferenceRecord:
+#  columns:
+#    id:
+#      type: integer
+#      sequence: test_table_03_seq
+#      primary: true
+#    varchar_field:
+#      type: string(50)
+#    self_reference_record_id:
+#      type: integer
+#  relations:
+#    ReferencedByRecord:
+#      class: SelfReferenceRecord
+#      local: self_reference_record_id
+#      foreign: id
+#      foreignType: many
+#      foreignAlias: ReferencedToRecords
