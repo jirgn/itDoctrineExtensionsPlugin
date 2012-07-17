@@ -22,10 +22,11 @@ Main Part is the Informix Driver Implementation.
 
 ## Requirements
 
+* PHP compiled with pdo-informix see http://www.php.net/manual/en/ref.pdo-informix.php
 * symfony framwork 1.3.x, 1.4.x
 * sfDoctrinePlugin enabled
 * sfPHPUnitPlugin (for running the tests) see https://github.com/makasim/sfPhpunitPlugin.git
-* Informix 11.5.x
+* IBM Informix 11.5.x Database
 
 
 ## Installation
@@ -69,19 +70,133 @@ So on linux or osx systems simply use the following command on bash.
 
 I only tested patching versions 1.2.3 and 1.2.4, but this should be fine with the latest 1.3 or 1.4 symfony versions.
 
-### Informix Environment
+## Informix
 
-
-## Building a Simple Informix Project
-
-First of all, when working with informix database, you should already know how to do it.
+First of all, when working with informix database, you should already know how to set it up.
 I figured out it is pretty hard to get a informix server running correctly and also the php-informx module is not bug free.
 Nevertheless following resources will be helpfull if you write sql or stored procedures by yourself.
 (hope with this plugin you will never neet this)
 http://publib.boulder.ibm.com/infocenter/idshelp/v115/index.jsp
 http://www.informix-zone.com/
 
-## Class Prefixes
+### Setup Database and Connection
+
+The Informix Driver in this plugin works with a few restictions.
+So first thing is, the **create database task is correctly not supported**, so you have to create your db by hand with a create database statement in standard Informix style.
+You could also use the tool **dbaccess** to get you a gui on shell.
+
+    in sql console
+    CREATE DATABASE name_of_the_db;
+
+It is essentioal to enable logging for this database to support transactions in your informix db.
+This can be done with the task ''informix:activate-loggin''.
+Because this task calls a informix tool called ''ontape'' it could be necessary to run this task as root user. this depends on your setup.
+The informix bin dir has to be in your $PATH.
+
+    $ symfony informix:activate-logging --db-name="<your_db_name>"
+
+You need to configure your informix connection in standard symfony style.
+The example below also uses differen connections, assuming you use also a mysql database.
+Find further details for the pdo driver and the connection string on
+http://php.net/manual/en/ref.pdo-informix.connection.php
+
+    ./config/databases.yml
+    all:
+      other_doctrine_connection:
+        class: sfDoctrineDatabase
+        param:
+          dsn:      mysql:host=localhost;dbname=informix
+          username: root
+          password:
+
+      ifx_dummy_connecton:
+        class: sfDoctrineDatabase
+        param:
+          #dsn: 'informix:host=itools-informix32; service=3306;database=ifx_test;server=itools;protocol=onsoctcp;db_locale=de_DE.819;client_locale=de_DE.UTF8;'
+          dsn: 'informix:host=itools-informix32; service=9088;database=ifx_test;server=itools;protocol=onsoctcp;'
+          username: root
+          password:
+
+### create Model
+
+You specify your model in the standard symfony style. For example our model for the testcase is defined like
+
+    config/doctrine/schema.yml
+
+    # if working with differnet connections the corresponding connection for the model has to be specified here
+    connection: ifx_dummy_connecton
+
+    SimpleRecord:
+      columns:
+        id:
+          type: integer
+          primary: true
+          autoincrement: true
+        varchar_field:
+          type: string(25)
+          default: default
+        text_field:
+          type: string
+        integer_field:
+          type: integer
+          default: 0
+        boolean_field:
+          type: boolean
+          default: false
+        date_field:
+          type: date
+        time_field:
+          type: time
+        timestamp_field:
+          type: timestamp
+
+In the second step you have to generate the model classes.
+There are two different ways to generate the model
+
+#### standard classes
+
+There is not much to say in this case. You just have to run the standard symfony task
+
+    $ symfony doctrine:build-model
+
+and you are done. you will find your classes in the lib/model dir as you know it.
+
+#### prefixed classes
+
+In some special cases you will need to prefix your classes to mark them in some conventional way.
+At least this was the case in the projekct i created this plugin for.
+
+My Usecase for example was to use the (nearly) same model in two
+different connections, so to say an internal and external system environment. I know this could be done by switching connection, but i
+had to do some tweaks for the different scopes and so decided to build different models, so i can implement them differently.
+
+To handle this, use an additional config file ''doctrine_ext.yml'', to configure the doctrine model_builder_options.
+
+    config/doctrine_ext.yml
+    model_builder_options:
+      classPrefix:
+        itDoctrineExtensionsPlugin: Test_
+        #someOtherPlugin: someOtherPrefix
+      baseClassName:
+        itDoctrineExtensionsPlugin: sfDoctrineRecord
+        #someOtherPlugin: someSpecialBaseClassForRecord
+
+Possible options are:
+*   baseClassesDirectory :: string (default : 'base')
+*   baseClassName :: string (default : 'sfDoctrineRecord')
+*   generateBaseClasses :: boolean (default : true)
+*   generateTableClasses :: boolean (default : true)
+*   packagesPrefix :: string (default : 'Plugin')
+*   suffix :: string (default : '.class.php')
+
+All the options can be specified per PluginName. **BE CAREFUL** this can lead to totally unexpected behaviour.
+You should a have a clear idea about what to reach and handle the pros and cons not to go the default way.
+
+So when you choose, you need this config part, you will see, that **the standard doctrine:build-model task will break**.
+This is, cause the doctine model builder can only handle one config on time.
+To get arround this use the new task
+
+    $ symfony doctrine:build-plugin-model
 
 ## Tasks
 
