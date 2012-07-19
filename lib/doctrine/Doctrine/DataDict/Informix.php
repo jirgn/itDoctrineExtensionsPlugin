@@ -31,36 +31,36 @@
  */
 class Doctrine_DataDict_Informix extends Doctrine_DataDict
 {
-  /**
-   * Obtain DBMS specific SQL code portion needed to declare an text type
-   * field to be used in statements like CREATE TABLE.
-   *
-   * @param array $field  associative array with the name of the properties
-   *      of the field being declared as array indexes. Currently, the types
-   *      of supported field properties are as follows:
-   *
-   *      length
-   *          Integer value that determines the maximum length of the text
-   *          field. If this argument is missing the field should be
-   *          declared to have the longest length allowed by the DBMS.
-   *
-   *      default
-   *          Text value to be used as default for this field.
-   *
-   *      notnull
-   *          Boolean flag that indicates whether this field is constrained
-   *          to not be set to null.
-   *
-   * @return string  DBMS specific SQL code portion that should be used to
-   *      declare the specified field.
-   */
+    /**
+     * Obtain DBMS specific SQL code portion needed to declare an text type
+     * field to be used in statements like CREATE TABLE.
+     *
+     * @param array $field  associative array with the name of the properties
+     *      of the field being declared as array indexes. Currently, the types
+     *      of supported field properties are as follows:
+     *
+     *      length
+     *          Integer value that determines the maximum length of the text
+     *          field. If this argument is missing the field should be
+     *          declared to have the longest length allowed by the DBMS.
+     *
+     *      default
+     *          Text value to be used as default for this field.
+     *
+     *      notnull
+     *          Boolean flag that indicates whether this field is constrained
+     *          to not be set to null.
+     *
+     * @throws RuntimeException
+     * @throws Doctrine_DataDict_Exception
+     * @return string  DBMS specific SQL code portion that should be used to
+     *      declare the specified field.
+     */
   public function getNativeDeclaration($field)
   {
     if ( ! isset($field['type'])) {
       throw new Doctrine_DataDict_Exception('Missing column type.');
     }
-    
-    //
     
     switch ($field['type']) {
       case 'char':
@@ -76,9 +76,7 @@ class Doctrine_DataDict_Informix extends Doctrine_DataDict
 
         $length = ( ! empty($field['length'])) ? $field['length'] : false;
         $fixed  = ((isset($field['fixed']) && $field['fixed']) || $field['type'] == 'char') ? true : false;
-        //HACK Utf-8 conversion on connections does not work correctly - so we have to double length
-        $length = $fixed ? $length : $length * 2;
-        
+
         $result = false;
         if($fixed)  {
           $result =  $length ? 'CHAR('.$length.')' : 'CHAR(255)';
